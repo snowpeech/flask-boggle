@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+<!-- -->
+{% block title %} Play Boggle {% endblock %}
+<!-- -->
+{% block content %}
+<p>Create words from adjacent letters on the board!</p>
+<table>
+  {% for row in board %}
+  <tr>
+    {% for letter in row %}
+    <td>{{letter}}</td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+
+<form action="" id="submit-form">
+  <input name="word" placeholder="word" />
+  <button>Submit</button>
+</form>
+
+<!-- -->
+{% endblock %}
