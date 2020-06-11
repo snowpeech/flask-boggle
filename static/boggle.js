@@ -1,41 +1,88 @@
 const $wordform = $("#submit-word");
-let word = "";
+let foundWords = new Set();
+let score = 0;
 
-// listener for logging in. Will setup the user instance
 $wordform.on("submit", async function (evt) {
   evt.preventDefault();
 
-  // Run route to check if valid word
-  word = $("#guess-word").val();
-  console.log(word);
-  const response = await checkWord(word);
-  console.log(response);
-  $("#guess-word").val("");
+  word = $("#guess-word").val().toLowerCase();
+
+  if (foundWords.has(word)) {
+    displayMessage(`${word} already found`, "bad");
+  } else {
+    const response = await checkWord(word);
+    handleWordResult(response, word);
+  }
+
+  clearFormInput();
 });
 
 async function checkWord(word) {
   const res = await axios.get("/check-word", { params: { word: word } });
 
-  result = res.data.result;
-  console.log("JS:: result is", result);
-  switch (result) {
+  result = res.data;
+
+  return res;
+}
+
+function handleWordResult(result, word) {
+  switch (result.data) {
     case "ok":
-      console.log("ok");
-      //word is real and in board
-      alert(`Great find! ${word} added`);
-      //need to check if it has already been guessed here too
+      displayMessage(`Great find! ${word} added`, "good");
+      foundWords.add(word);
+      score += word.length;
+      $("#score").text(score);
+      $("#list").append(`<li>${word}</li>`);
+      console.log("did word append?");
       break;
 
     case "not-on-board":
-      console.log("not on board");
-      alert(`${word} isn't on this board`);
+      displayMessage(`${word} isn't on this board`, "bad");
       break;
 
     case "not-word":
-      console.log("not word");
-      alert(`${word} isn't in the dictionary`);
+      displayMessage(`${word} isn't in the dictionary`, "bad");
       break;
   }
+}
 
-  return res;
+function clearFormInput() {
+  $("#guess-word").val("");
+}
+
+function displayMessage(message, cls) {
+  $("#messages").text(message).attr("class", cls);
+}
+
+//start timer on page load
+$(window).load(countdown(20, endGame));
+
+var timeoutHandle;
+
+function countdown(seconds, stopFunction) {
+  function tick() {
+    var $counter = $("#timer");
+    seconds--;
+    $counter.html((seconds < 10 ? "0" : "") + String(seconds));
+    if (seconds > 0) {
+      timeoutHandle = setTimeout(tick, 1000);
+    }
+
+    if (seconds <= 0) {
+      stopFunction();
+    }
+  }
+
+  tick();
+}
+
+async function endGame() {
+  // when time ends, replace input field with final score
+  $wordform.html(`<p>Final Score: <em>${score}</em></p>`);
+
+  const res = await axios.get("/end-game", { params: { score: score } });
+
+  results = `<p>High Score: ${res.data.high_score}</p>
+  <p>Games Played: ${res.data.game_plays}</p>`;
+  $("#endGameResults").html(results);
 }

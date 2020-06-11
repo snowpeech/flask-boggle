@@ -3,9 +3,17 @@ body {
 }
 
 h1 {
-  color: red;
+  color: rgb(7, 6, 80);
 }
 
 p {
   color: blue;
+}
+
+.bad {
+  color: red;
+}
+
+.good {
+  color: green;
 }

@@ -4,6 +4,21 @@
 <!-- -->
 {% block content %}
 <p>Create words from adjacent letters on the board!</p>
+<div id="messages"></div>
+
+{% for msg in get_flashed_messages() %}
+<p>{{ msg }}</p>
+{% endfor %}
+
+<div>High Score: <span>{{high_score}}</span></div>
+<div>Games Played: <span>{{game_plays}}</span></div>
+
+<p>Score:<span id="score">0</span></p>
+<p>
+  Timer:
+  <span id="timer"></span>
+</p>
+
 <table>
   {% for row in board %}
   <tr>
@@ -18,6 +33,11 @@
   <input name="word" placeholder="word" id="guess-word" />
   <button>Submit</button>
 </form>
+
+<div id="endGameResults"></div>
+<ul id="list">
+  Found Words:
+</ul>
 
 <!-- -->
 {% endblock %}
