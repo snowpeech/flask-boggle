@@ -38,28 +38,10 @@ def end_game():
 
     score = request.args["score"]
 
-    if "game_plays" in session:
-        session["game_plays"] = session.get("game_plays") + 1
-        if session["high_score"] < score:
-            session["high_score"] = score
-            flash(f"New High Score! {score}")
-            print("**new high score from game plays if**")
+    high_score = session.get("high_score", 0)
+    session['high_score'] = max(score, high_score)
 
-    else:
-        session["game_plays"] = 1
-    game_plays = session["game_plays"]
-
-    if "high_score" not in session:
-        session["high_score"] = score
-    else:
-
-        if int(session["high_score"]) < int(score):
-            session["high_score"] = score
-            flash(f"New High Score! {score}")
-
-    high_score = session["high_score"]
-
-    # return render_template(
-    #     "board.html", board=board,
-    # )
+    game_plays = session.get("game_plays", 0)
+    session['game_plays'] = game_plays + 1
+   
     return jsonify(high_score=high_score, game_plays=game_plays)
